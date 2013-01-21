@@ -1,8 +1,10 @@
 from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
+from google.appengine.ext.webapp import template
 
 import jsonrest
+import webHandler
 
 def main():
   application = webapp.WSGIApplication([
@@ -17,4 +19,3 @@ class Homepage(webapp.RequestHandler):
 
 if __name__ == '__main__':
   main()
-
