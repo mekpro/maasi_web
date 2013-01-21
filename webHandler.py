@@ -16,9 +16,9 @@ class Overview(webapp.RequestHandler):
     c = jsonrest.Client(settings.server)
     hostlist = c.request("get",{})
     host_load = []
-    for host in hostlist:
-      loadavg = c.request("get/%s/loadavg/load1m" %host, {})
-      host_load.append((host, loadavg))
+    for hostname in hostlist:
+      loadavg = c.request("get/%s/loadavg/load1m" %hostname, {})
+      host_load.append((hostname, loadavg))
 
     tpv = {
       'hostlist' : hostlist,
@@ -28,12 +28,24 @@ class Overview(webapp.RequestHandler):
     self.response.out.write(template.render(path, tpv))
 
 class Host(webapp.RequestHandler):
-  def get(self):
+  def get(self, hostname):
     tpv = dict()
+    c = jsonrest.Client(settings.server)
+    hostlist = c.request("get",{})
+    # TODO: check host exists
+    data = dict()
+    modules =  c.request("get/%s" %hostname, {})
+    for module in modules:
+      data[module] = dict()
+      metrics = c.request("get/%s/%s" %(hostname, module), {})
+      for metric in metrics:
+        value = c.request("get/%s/%s/%s" %(hostname, module, metric), {"datatype":"range"})
+        data[module][metric] = value
 
     tpv = {
       'hostlist' : hostlist,
-      'host_load' : host_load,
+      'data' : data,
     }
+    logging.info(data)
     path = os.path.join(os.path.dirname(__file__), 'templates/host.tpl')
     self.response.out.write(template.render(path, tpv))
