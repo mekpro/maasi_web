@@ -61,7 +61,7 @@
               <div class="graph" id={{module.0}}{{metric.0}}></div>
               <script>
                 f = document.getElementById('{{module.0}}{{metric.0}}')
-                graph = Flotr.draw(f, [[[0,10],[2,2],[30,3],[40,4]]],
+                graph = Flotr.draw(f, [{{metric.1}}],
                   {});
               </script>
             {% endfor %}
@@ -70,9 +70,5 @@
       </div>
     </div>
   </div>
-
-<div id=kuay></div>
-<script> Flotr.draw(document.getElementById('kuay'), [[1,1],[2,2],[8,3]]); </script>
-
 </body>
 </html>
