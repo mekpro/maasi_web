@@ -16,7 +16,8 @@
     .graph {
       width: 320px;
       height: 240px;
-      margin: 8px auto;
+      margin: 12px auto;
+      float: left;
     }
 
     #kuay {
@@ -24,7 +25,6 @@
       height: 240px;
       margin: 8px auto;
     }
-
   </style>
 </head>
 <body>
@@ -33,7 +33,7 @@
       <div class="container-fluid">
         <a class="brand" href="#">MaaSi</a> 
         <ul class="nav">
-          <li class="active"><a href="#">Overview</a></li>
+          <li class="active"><a href="/overview">Overview</a></li>
           <li><a href="#">Host</a></li>
           <li><a href="#">VM</a></li>
           <li><a href="#">Report</a></li>
@@ -47,24 +47,32 @@
       <div class="span3">
         <h3>hostlist</h3>
         <ul>
-          {% for host in hostlist %}
-            <li><a href='/host/{{host}}'>{{host}}</a></li>
+          {% for hostgroup in hosttree.iteritems %}
+            <li><b>{{hostgroup.0}} </b></li>
+            <ul>
+            {% for host in hostgroup.1%}
+              <li><a href='/host/{{hostgroup.0}}__{{host}}'>{{host}}</a></li>
+            {% endfor %}
+            </ul>
           {% endfor %}
         </ul>
       </div>
       <div class="span9">
-        <h1>Hostname Data </h1>
+        <h1>{{hostname}}</h1>
+          <ul>
+            <li>Last Updated: {{last_update}} </li>
+          </ul>
           {% for module in data.items %}
-            <h2>{{module.0}} </h2>
+            <h3>{{module.0}} </h3>
             {% for metric in module.1.items %}
-              <h3> {{metric.0}} </h3>
               <div class="graph" id={{module.0}}{{metric.0}}></div>
               <script>
                 f = document.getElementById('{{module.0}}{{metric.0}}')
                 graph = Flotr.draw(f, [{{metric.1}}],
-                  {});
+                  {title: '{{metric.0}}' });
               </script>
             {% endfor %}
+            <div style="clear:both"></div>
           {% endfor %}
         </h3>
       </div>

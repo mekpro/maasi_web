@@ -32,8 +32,13 @@
       <div class="span3">
         <h3>hostlist</h3>
         <ul>
-          {% for host in hostlist %}
-            <li><a href='/host/{{host}}'>{{host}}</a></li>
+          {% for hostgroup in hosttree.iteritems %}
+            <li><b>{{hostgroup.0}} </b></li>
+            <ul>
+            {% for host in hostgroup.1%}
+              <li><a href='/host/{{hostgroup.0}}__{{host}}'>{{host}}</a></li>
+            {% endfor %}
+            </ul>
           {% endfor %}
         </ul>
       </div>

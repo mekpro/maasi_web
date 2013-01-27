@@ -10,10 +10,24 @@ import settings
 
 import jsonrest
 
+def getHostTree():
+  r = dict()
+  c = jsonrest.Client(settings.server)
+  hostlist = c.request("get",{})
+  for host in hostlist:
+    p = host.split("__")
+    r[p[0]] = list()
+  for host in hostlist:
+    p = host.split("__")
+    r[p[0]].append(p[1])
+  logging.info(r)
+  return r
+
 class Overview(webapp.RequestHandler):
   def get(self):
     tpv = dict()
     c = jsonrest.Client(settings.server)
+    hosttree = getHostTree()
     hostlist = c.request("get",{})
     host_load = []
     for hostname in hostlist:
@@ -21,6 +35,7 @@ class Overview(webapp.RequestHandler):
       host_load.append((hostname, loadavg))
 
     tpv = {
+      'hosttree' : hosttree,
       'hostlist' : hostlist,
       'host_load' : host_load,
     }
@@ -30,6 +45,7 @@ class Overview(webapp.RequestHandler):
 class Host(webapp.RequestHandler):
   def get(self, hostname):
     tpv = dict()
+    hosttree = getHostTree()
     c = jsonrest.Client(settings.server)
     hostlist = c.request("get",{})
     # TODO: check host exists
@@ -43,6 +59,8 @@ class Host(webapp.RequestHandler):
         data[module][metric] = value
 
     tpv = {
+      'hostname' : hostname,
+      'hosttree' : hosttree,
       'hostlist' : hostlist,
       'data' : data,
     }
