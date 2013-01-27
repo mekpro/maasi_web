@@ -8,30 +8,29 @@ import datetime
 import logging
 import settings
 
+import base
 import jsonrest
 
-def getHostTree():
+def genHostTree(hostlist):
   r = dict()
-  c = jsonrest.Client(settings.server)
-  hostlist = c.request("get",{})
   for host in hostlist:
     p = host.split("__")
     r[p[0]] = list()
   for host in hostlist:
     p = host.split("__")
-    r[p[0]].append(p[1])
-  logging.info(r)
+    if len(p) > 1:
+      r[p[0]].append(p[1])
   return r
 
-class Overview(webapp.RequestHandler):
+class Overview(base.Base):
   def get(self):
     tpv = dict()
-    c = jsonrest.Client(settings.server)
-    hosttree = getHostTree()
-    hostlist = c.request("get",{})
+    self.initSession()
+    hostlist = self.c.request("get",{})
+    hosttree = genHostTree(hostlist)
     host_load = []
     for hostname in hostlist:
-      loadavg = c.request("get/%s/loadavg/load1m" %hostname, {})
+      loadavg = self.c.request("get/%s/loadavg/load1m" %hostname, {})
       host_load.append((hostname, loadavg))
 
     tpv = {
@@ -42,20 +41,20 @@ class Overview(webapp.RequestHandler):
     path = os.path.join(os.path.dirname(__file__), 'templates/overview.tpl')
     self.response.out.write(template.render(path, tpv))
 
-class Host(webapp.RequestHandler):
+class Host(base.Base):
   def get(self, hostname):
+    self.initSession()
     tpv = dict()
-    hosttree = getHostTree()
-    c = jsonrest.Client(settings.server)
-    hostlist = c.request("get",{})
+    hostlist = self.c.request("get",{})
+    hosttree = genHostTree(hostlist)
     # TODO: check host exists
     data = dict()
-    modules =  c.request("get/%s" %hostname, {})
+    modules =  self.c.request("get/%s" %hostname, {})
     for module in modules:
       data[module] = dict()
-      metrics = c.request("get/%s/%s" %(hostname, module), {})
+      metrics = self.c.request("get/%s/%s" %(hostname, module), {})
       for metric in metrics:
-        value = c.request("get/%s/%s/%s" %(hostname, module, metric), {"datatype":"range"})
+        value = self.c.request("get/%s/%s/%s" %(hostname, module, metric), {"datatype":"range"})
         data[module][metric] = value
 
     tpv = {

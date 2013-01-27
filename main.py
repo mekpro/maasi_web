@@ -5,10 +5,13 @@ from google.appengine.ext.webapp import template
 
 import jsonrest
 import webHandler
+import authHandler
 
 def main():
   application = webapp.WSGIApplication([
     # (r'/', Homepage),
+    (r'/login', authHandler.Login),
+    (r'/logout', authHandler.Logout),
     (r'/overview', webHandler.Overview),
     (r'/host/(.*)', webHandler.Host),
   ], debug=True)
