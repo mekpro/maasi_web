@@ -1,8 +1,12 @@
 import urllib2
 import urllib
-import urlparse
 import logging
 import datetime
+
+try:
+  from urlparse import parse_qsl
+except ImportError:
+  from cgi import parse_qsl
 
 try:
   import simplejson
@@ -49,8 +53,9 @@ def response(datadict):
 
 def parse_post(params):
   try:
-    r = urlparse.parse_qsl(params)
-    return dict(r)
+    r = parse_qsl(params)
+    r = dict(r)
+    return r
   except:
     logging.error("error decoding post'%s'" %params)
 
@@ -58,7 +63,7 @@ def dumps(datadict):
   r = simplejson.dumps(datadict)
   r = r.replace('\"','')
   r = r.replace('\'','\"')
-  logging.info(r)
+  #logging.info(r)
   return r
 
 def loads(datastr):
