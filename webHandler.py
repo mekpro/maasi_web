@@ -66,3 +66,23 @@ class Host(base.Base):
     logging.info(data)
     path = os.path.join(os.path.dirname(__file__), 'templates/host.tpl')
     self.response.out.write(template.render(path, tpv))
+
+class HostGetAll(base.Base):
+  def get(self, hostname):
+    self.initSession()
+    tpv = dict()
+    hostlist = self.c.request("get",{})
+    hosttree = genHostTree(hostlist)
+    data = self.c.request("getall/%s" %hostname, {"datatype":"range"})
+
+    tpv = {
+      'hostname' : hostname,
+      'hosttree' : hosttree,
+      'hostlist' : hostlist,
+      'data' : data,
+    }
+    logging.info(data)
+    path = os.path.join(os.path.dirname(__file__), 'templates/host.tpl')
+    self.response.out.write(template.render(path, tpv))
+
+

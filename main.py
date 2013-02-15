@@ -15,7 +15,8 @@ def main():
     (r'/login', authHandler.Login),
     (r'/logout', authHandler.Logout),
     (r'/overview', webHandler.Overview),
-    (r'/host/(.*)', webHandler.Host),
+    (r'/hoste/(.*)', webHandler.Host),
+    (r'/host/(.*)', webHandler.HostGetAll),
     # Benchmark utils
     (r'/bench_latency', BenchLatency),
   ], debug=True)
